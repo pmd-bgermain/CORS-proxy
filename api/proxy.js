@@ -88,7 +88,16 @@ export default async function handler(req, res) {
   try {
     const parsedUrl = new URL(targetUrl);
     
-    const response = await fetch(parsedUrl.toString());
+    // Modification ICI : Ajout d'headers pour simuler un navigateur
+    const response = await fetch(parsedUrl.toString(), {
+      headers: {
+        // User-Agent standard (Chrome Windows) pour éviter le blocage par les serveurs distants
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        // On accepte tout type de contenu
+        'Accept': '*/*' 
+      }
+    });
+
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
@@ -117,10 +126,13 @@ export default async function handler(req, res) {
     if (origin) {
       res.setHeader('Access-Control-Allow-Origin', origin);
     }
+    // On renvoie l'erreur originale (cause) si disponible pour faciliter le debug
+    const errorMessage = error.cause ? error.cause.message : error.message;
+    
     res.status(500).json({ 
       error: 'Proxy Error', 
       message: 'Failed to fetch the target URL.',
-      details: error.message 
+      details: errorMessage
     });
   }
 }
