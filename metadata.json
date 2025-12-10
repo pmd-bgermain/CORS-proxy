@@ -1,0 +1,5 @@
+{
+  "name": "CORS Proxy",
+  "description": "A secure Serverless Function for Vercel acting as a CORS proxy, with a React frontend to test it.",
+  "requestFramePermissions": []
+}
