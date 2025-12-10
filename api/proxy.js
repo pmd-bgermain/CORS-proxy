@@ -28,7 +28,13 @@ export default async function handler(req, res) {
   ];
 
   const isAllowedOrigin = (origin) => {
-    if (!origin) return false;
+    // IMPORTANT : Les navigateurs n'envoient PAS le header 'Origin' pour les requêtes GET
+    // effectuées depuis le même domaine (Same-Origin).
+    // Nous devons donc autoriser les requêtes sans origine pour que l'app React fonctionne
+    // une fois déployée sur le même domaine que l'API.
+    // La sécurité repose alors principalement sur le 'x-proxy-secret'.
+    if (!origin) return true;
+
     if (allowedOrigins.includes(origin)) return true;
     if (origin.endsWith('.vercel.app')) return true;
     return false;
@@ -44,7 +50,10 @@ export default async function handler(req, res) {
   // --- 3. GESTION DES PREFLIGHTS CORS (OPTIONS) ---
   
   if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', origin);
+    // On ne renvoie les headers CORS que si une origine était présente dans la requête
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     // On autorise explicitement notre header personnalisé 'x-proxy-secret'
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-proxy-secret');
@@ -85,7 +94,9 @@ export default async function handler(req, res) {
 
     // --- 6. PRÉPARATION DE LA RÉPONSE ---
 
-    res.setHeader('Access-Control-Allow-Origin', origin);
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     
     const contentType = response.headers.get('content-type');
     if (contentType) {
@@ -103,7 +114,9 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Proxy Error:', error);
-    res.setHeader('Access-Control-Allow-Origin', origin);
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    }
     res.status(500).json({ 
       error: 'Proxy Error', 
       message: 'Failed to fetch the target URL.',
