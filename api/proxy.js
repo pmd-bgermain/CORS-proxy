@@ -20,11 +20,11 @@ export default async function handler(req, res) {
   
   const origin = req.headers.origin;
 
-  // Liste des origines explicitement autorisées
+  // Liste des origines explicitement autorisées (match exact)
   const allowedOrigins = [
     'http://localhost:3000',      // Développement local (Create React App)
     'http://localhost:5173',      // Développement local (Vite)
-    'https://aistudio.google.com' // Google AI Studio
+    'https://aistudio.google.com' // Interface principale Google AI Studio
   ];
 
   const isAllowedOrigin = (origin) => {
@@ -32,8 +32,17 @@ export default async function handler(req, res) {
     // effectuées depuis le même domaine (Same-Origin).
     if (!origin) return true;
 
+    // 1. Match exact
     if (allowedOrigins.includes(origin)) return true;
+
+    // 2. Match dynamique pour les déploiements Vercel
     if (origin.endsWith('.vercel.app')) return true;
+
+    // 3. Match dynamique pour les Previews Google AI Studio / Cloud Shell
+    // Exemple : https://0xhkooxgg...-h839267052.scf.usercontent.goog
+    if (origin.endsWith('.scf.usercontent.goog')) return true;
+    if (origin.endsWith('.googleusercontent.com')) return true;
+
     return false;
   };
 
@@ -41,7 +50,7 @@ export default async function handler(req, res) {
 
   // Vérification de base de l'origine (CORS Layer)
   if (!isAllowedOrigin(origin)) {
-    return res.status(403).json({ error: 'Forbidden', message: 'Invalid Origin' });
+    return res.status(403).json({ error: 'Forbidden', message: `Invalid Origin: ${origin}` });
   }
 
   // --- 3. GESTION DES PREFLIGHTS CORS (OPTIONS) ---

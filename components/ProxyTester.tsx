@@ -46,7 +46,7 @@ export const ProxyTester: React.FC = () => {
     setStatus(null);
 
     try {
-      const proxyEndpoint = `/api/proxy?url=${encodeURIComponent(url)}`;
+      const proxyEndpoint = `https://wors-proxy-seven-alpha.vercel.app/api/proxy?url=${encodeURIComponent(url)}`;
       
       const res = await fetch(proxyEndpoint, {
         method: 'GET',
