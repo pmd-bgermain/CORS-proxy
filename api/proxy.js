@@ -32,6 +32,10 @@ export default async function handler(req, res) {
     // effectuées depuis le même domaine (Same-Origin).
     if (!origin) return true;
 
+    // 0. Support des iframes sandboxed (AI Studio Preview, CodeSandbox)
+    // C'est souvent la cause du "Failed to fetch" dans les environnements de preview
+    if (origin === 'null') return true;
+
     // 1. Match exact
     if (allowedOrigins.includes(origin)) return true;
 
@@ -56,8 +60,11 @@ export default async function handler(req, res) {
   // --- 3. GESTION DES PREFLIGHTS CORS (OPTIONS) ---
   
   if (req.method === 'OPTIONS') {
+    // Si l'origine est 'null', on doit renvoyer '*' car 'null' n'est pas toujours valide dans ACAO selon les navigateurs
+    // ou renvoyer 'null' explicitement si le navigateur le supporte.
+    // Pour simplifier dans le cas 'null', on renvoie '*' MAIS on s'assure que le reste de la sécurité (Secret) est solide.
     if (origin) {
-      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Origin', origin === 'null' ? '*' : origin);
     }
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-proxy-secret');
@@ -155,7 +162,8 @@ export default async function handler(req, res) {
     // --- 6. PRÉPARATION DE LA RÉPONSE ---
 
     if (origin) {
-      res.setHeader('Access-Control-Allow-Origin', origin);
+      // Pour les cas 'null', on a décidé de renvoyer '*' dans le bloc OPTIONS, on reste cohérent ici.
+      res.setHeader('Access-Control-Allow-Origin', origin === 'null' ? '*' : origin);
     }
     
     const contentType = response.headers.get('content-type');
@@ -175,7 +183,7 @@ export default async function handler(req, res) {
   } catch (error) {
     console.error('Proxy Error:', error);
     if (origin) {
-      res.setHeader('Access-Control-Allow-Origin', origin);
+       res.setHeader('Access-Control-Allow-Origin', origin === 'null' ? '*' : origin);
     }
     const errorMessage = error.cause ? error.cause.message : error.message;
     
