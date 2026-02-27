@@ -1,8 +1,20 @@
 import React, { useState } from 'react';
 import { Search, Loader2, XCircle, CheckCircle, Key, Eye, EyeOff, Info, AlertTriangle } from 'lucide-react';
 
-// URL du proxy codée en dur
-const PROXY_BASE_URL = 'https://cors-proxy-seven-alpha.vercel.app/api/proxy';
+// URL du proxy dynamique selon l'environnement
+const getProxyUrl = () => {
+  // Si on est en local ou dans l'environnement de preview AI Studio
+  if (
+    typeof window !== 'undefined' && 
+    (window.location.hostname === 'localhost' || window.location.hostname.endsWith('.run.app'))
+  ) {
+    return '/api/proxy';
+  }
+  // En production (déployé sur Vercel ou ailleurs)
+  return 'https://cors-proxy-seven-alpha.vercel.app/api/proxy';
+};
+
+const PROXY_BASE_URL = getProxyUrl();
 
 export const ProxyTester: React.FC = () => {
   // Fonction utilitaire pour récupérer le secret de l'environnement
