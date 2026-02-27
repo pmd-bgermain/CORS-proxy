@@ -29,9 +29,8 @@ export const ProxyTester: React.FC = () => {
   // État pour l'URL cible
   const [url, setUrl] = useState('');
   
-  // État pour le Secret
-  const [secret, setSecret] = useState(getInitialSecret()); 
-  const [showSecret, setShowSecret] = useState(false);
+  // Le secret est lu directement depuis l'environnement
+  const secret = getInitialSecret();
 
   // États de réponse
   const [response, setResponse] = useState<string | null>(null);
@@ -90,10 +89,10 @@ export const ProxyTester: React.FC = () => {
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
       <div className="p-6 border-b border-slate-100 bg-slate-50/50">
-        <form onSubmit={handleFetch} className="flex flex-col gap-4">
+        <form onSubmit={handleFetch} className="flex flex-col sm:flex-row gap-4">
           
           {/* Input URL Target */}
-          <div className="relative group">
+          <div className="relative group flex-1">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
             </div>
@@ -107,43 +106,20 @@ export const ProxyTester: React.FC = () => {
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Secret Input */}
-            <div className="relative group flex-1">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Key className="h-5 w-5 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-              </div>
-              <input
-                type={showSecret ? "text" : "password"}
-                value={secret}
-                onChange={(e) => setSecret(e.target.value)}
-                placeholder="Clé API (Proxy Secret)"
-                className="block w-full pl-10 pr-10 py-3 border border-slate-300 rounded-lg leading-5 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:placeholder-transparent selection:bg-indigo-500 selection:text-white sm:text-sm transition-all"
-              />
-              <button
-                type="button"
-                onClick={() => setShowSecret(!showSecret)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-slate-400 hover:text-slate-600 focus:outline-none"
-              >
-                {showSecret ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-colors whitespace-nowrap"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="animate-spin -ml-1 mr-2 h-5 w-5" />
-                  Chargement...
-                </>
-              ) : (
-                'Envoyer la requête'
-              )}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-colors whitespace-nowrap"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="animate-spin -ml-1 mr-2 h-5 w-5" />
+                Chargement...
+              </>
+            ) : (
+              'Envoyer la requête'
+            )}
+          </button>
         </form>
       </div>
 
