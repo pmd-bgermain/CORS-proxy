@@ -20,11 +20,12 @@ export const ProxyTester: React.FC = () => {
   // Fonction utilitaire pour récupérer le secret de l'environnement
   const getInitialSecret = () => {
     try {
-      const meta = import.meta as any;
-      if (typeof meta !== 'undefined' && meta.env) {
-        if (meta.env.VITE_PROXY_SECRET) return meta.env.VITE_PROXY_SECRET;
-        if (meta.env.PROXY_SECRET) return meta.env.PROXY_SECRET;
+      // Vite requiert l'utilisation explicite de "import.meta.env.NOM_VARIABLE" 
+      // pour pouvoir faire le remplacement statique lors du build de production.
+      if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_PROXY_SECRET) {
+        return import.meta.env.VITE_PROXY_SECRET;
       }
+      // Fallback pour d'autres environnements (Next.js, CRA, etc.) si jamais le code est copié
       if (typeof process !== 'undefined' && process.env) {
         return process.env.PROXY_SECRET || 
                process.env.NEXT_PUBLIC_PROXY_SECRET || 

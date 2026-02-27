@@ -67,7 +67,7 @@ export default function App() {
               </li>
             </ul>
             <div className="mt-4 text-xs text-slate-500 bg-slate-50 border border-slate-100 p-3 rounded-md">
-              <span className="font-semibold text-slate-700">Note :</span> Configurez la variable d'environnement <code className="font-mono bg-white px-1 border border-slate-200 rounded">PROXY_SECRET</code> dans Vercel pour sécuriser l'accès.
+              <span className="font-semibold text-slate-700">Note :</span> Configurez les variables d'environnement <code className="font-mono bg-white px-1 border border-slate-200 rounded">PROXY_SECRET</code> (pour le backend) et <code className="font-mono bg-white px-1 border border-slate-200 rounded">VITE_PROXY_SECRET</code> (pour le frontend) dans Vercel pour sécuriser l'accès.
             </div>
           </div>
         </div>
