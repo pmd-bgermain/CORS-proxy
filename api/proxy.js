@@ -47,6 +47,9 @@ export default async function handler(req, res) {
     if (origin.endsWith('.scf.usercontent.goog')) return true;
     if (origin.endsWith('.googleusercontent.com')) return true;
 
+    // 4. Match dynamique pour les environnements AI Studio (Cloud Run)
+    if (origin.endsWith('.run.app')) return true;
+
     return false;
   };
 
